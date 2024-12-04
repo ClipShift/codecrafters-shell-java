@@ -53,7 +53,16 @@ public class Main {
                         }
                     }
                 }
-            } else {
+            } else if(scripts.containsKey(command[0])){
+                ProcessBuilder processBuilder = new ProcessBuilder(command[0]);
+                if(command.length > 1){
+                    processBuilder.command(command[0], command[1]);
+                }
+                processBuilder.inheritIO();
+                Process process = processBuilder.start();
+                int exitCode = process.waitFor();
+            }
+            else {
                 System.out.printf("%s: command not found%n", input);
             }
         }
