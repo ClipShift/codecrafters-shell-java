@@ -1,5 +1,6 @@
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -21,6 +22,8 @@ public class Main {
 
             }
         }
+        Path currentPath = Paths.get("");
+        String pwd = currentPath.toAbsolutePath().toString();
 
         // Uncomment this block to pass the first stage
         repl:
@@ -55,15 +58,30 @@ public class Main {
                     }
 
                     case pwd: {
-                        Path currentPath = Paths.get("");
-                        String absolutePath = currentPath.toAbsolutePath().toString();
-                        System.out.println(absolutePath);
+                        System.out.println(pwd);
+                        break;
+                    }
+
+                    case cd: {
+                        try{
+                            Path newPath = Paths.get(command[1]);
+                            if(Files.notExists(newPath)){
+                                System.out.printf("cd: %s: No such file or directory%n", command[1]);
+                            } else {
+                                pwd = newPath.toAbsolutePath().toString();
+                            }
+                        } catch (InvalidPathException e){
+                            System.out.printf("cd: %s: No such file or directory%n", command[1]);
+                        }
+                        break;
                     }
                 }
             } else if(scripts.containsKey(command[0])){
                 ProcessBuilder processBuilder = new ProcessBuilder(command[0]);
                 if(command.length > 1){
                     processBuilder.command(command[0], command[1]);
+                } else if("ls".equals(command[0])){
+                    processBuilder.command(command[0], pwd);
                 }
                 processBuilder.inheritIO();
                 Process process = processBuilder.start();
@@ -89,5 +107,6 @@ enum Builtin {
     exit,
     echo,
     type,
-    pwd
+    pwd,
+    cd
 }
