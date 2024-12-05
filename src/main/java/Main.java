@@ -64,11 +64,15 @@ public class Main {
 
                     case cd: {
                         try{
-                            Path newPath = Paths.get(command[1]);
+                            Path newPath;
+                            if (command[1].charAt(0) == '/')
+                                newPath = Paths.get(command[1]);
+                            else
+                                newPath = Paths.get(pwd, command[1]);
                             if(Files.notExists(newPath)){
                                 System.out.printf("cd: %s: No such file or directory%n", command[1]);
                             } else {
-                                pwd = newPath.toAbsolutePath().toString();
+                                pwd = newPath.toRealPath().toAbsolutePath().toString();
                             }
                         } catch (InvalidPathException e){
                             System.out.printf("cd: %s: No such file or directory%n", command[1]);
