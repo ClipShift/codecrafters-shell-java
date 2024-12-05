@@ -65,7 +65,10 @@ public class Main {
                     case cd: {
                         try{
                             Path newPath;
-                            if (command[1].charAt(0) == '/')
+                            if (command[1].charAt(0) == '~'){
+                                newPath = Paths.get(System.getenv("HOME"), command[1].substring(1));
+                            }
+                            else if (command[1].charAt(0) == '/')
                                 newPath = Paths.get(command[1]);
                             else
                                 newPath = Paths.get(pwd, command[1]);
