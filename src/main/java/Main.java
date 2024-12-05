@@ -51,6 +51,13 @@ public class Main {
                         else {
                             System.out.printf("%s: not found%n", command[1]);
                         }
+                        break;
+                    }
+
+                    case pwd: {
+                        Path currentPath = Paths.get("");
+                        String absolutePath = currentPath.toAbsolutePath().toString();
+                        System.out.println(absolutePath);
                     }
                 }
             } else if(scripts.containsKey(command[0])){
@@ -81,5 +88,6 @@ public class Main {
 enum Builtin {
     exit,
     echo,
-    type
+    type,
+    pwd
 }
