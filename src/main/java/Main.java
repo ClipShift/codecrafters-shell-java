@@ -32,6 +32,7 @@ public class Main {
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine();
             String[] command = input.split(" ", 2);
+
             if(isBuiltin(command[0])){
                 Builtin builtin = Builtin.valueOf(command[0]);
                 switch (builtin){
@@ -41,7 +42,8 @@ public class Main {
                     }
 
                     case echo: {
-                        System.out.println(command[1]);
+                        List<String> strings = parseQuotes(command[1]);
+                        System.out.println(strings.getFirst());
                         break;
                     }
 
@@ -92,6 +94,9 @@ public class Main {
                 }
                 processBuilder.inheritIO();
                 Process process = processBuilder.start();
+                if("cat".equals(command[0])){
+                    System.out.println();
+                }
                 int exitCode = process.waitFor();
             }
             else {
@@ -107,6 +112,24 @@ public class Main {
         } catch (IllegalArgumentException _){
             return false;
         }
+    }
+
+    private static List<String> parseQuotes(String str){
+        List<String> result = new ArrayList<>();
+
+        int i = 0, start = 1;
+
+        while(i < str.length()){
+            do {
+                i++;
+            } while (i < str.length() && str.charAt(i) != '\'');
+            result.add(str.substring(start, i));
+            do {
+                i++;
+            } while (i < str.length() && str.charAt(i) != '\'');
+        }
+
+        return result;
     }
 }
 
