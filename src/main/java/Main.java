@@ -138,17 +138,22 @@ public class Main {
                 }
                 String currentString = str.substring(start, i);
                 Stack<Character> stk = new Stack<>();
-                for(int j = 1; j < currentString.length(); j++){
+                boolean lastPop = false;
+                for(int j = 0; j < currentString.length(); j++){
                     if(!stk.isEmpty() && stk.peek() == '\\'){
-                        if(str.charAt(j) == '\\' || str.charAt(j) == '"' || str.charAt(j) == '$'){
+                        if(currentString.charAt(j) == '\\' || currentString.charAt(j) == '"' || currentString.charAt(j) == '$'){
                             stk.pop();
+                            if(j == currentString.length()-1){
+                                lastPop = true;
+                            }
                         }
-                        stk.push(str.charAt(j));
+                        stk.push(currentString.charAt(j));
                     } else {
-                        if(str.charAt(j) != '"')
-                            stk.push(str.charAt(j));
+                        if(currentString.charAt(j) != '"')
+                            stk.push(currentString.charAt(j));
                     }
                 }
+                if(stk.peek() == '\\' && !lastPop) stk.pop();
                 StringBuilder builder = new StringBuilder();
                 while(!stk.isEmpty()){
                     builder.append(stk.pop());
@@ -179,3 +184,7 @@ enum Builtin {
     pwd,
     cd
 }
+
+//$ echo "world'test'\\n'script"
+//$ echo "hello\"insidequotes"world\"
+//$ echo "mixed\"quote'test'\\"
