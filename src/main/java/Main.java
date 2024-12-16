@@ -100,9 +100,6 @@ public class Main {
                 }
                 processBuilder.inheritIO();
                 Process process = processBuilder.start();
-                if ("cat".equals(command[0])) {
-                    System.out.println();
-                }
                 int exitCode = process.waitFor();
             } else {
                 System.out.printf("%s: command not found%n", input);
