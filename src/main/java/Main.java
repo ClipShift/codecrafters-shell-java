@@ -136,14 +136,14 @@ public class Main {
                 while (i < str.length() && (str.charAt(i-1) == '\\' || str.charAt(i) != '"')) {
                     i++;
                 }
-                result.add(str.substring(start, i).replace("\\", ""));
+                result.add(str.substring(start, i).replace("\\\"", "\""));
                 i++;
             } else {
                 int start = i;
-                while (i < str.length() && str.charAt(i) != ' ') {
+                while (i < str.length() && ((i>0 && str.charAt(i-1) == '\\') || str.charAt(i) != ' ')) {
                     i++;
                 }
-                result.add(str.substring(start, i));
+                result.add(str.substring(start, i).replace("\\", ""));
             }
         }
 
