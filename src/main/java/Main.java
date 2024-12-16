@@ -120,7 +120,7 @@ public class Main {
         List<String> result = new ArrayList<>();
         int i = 0;
         while (i < str.length()) {
-            while(i < str.length() && str.charAt(i) == ' ')
+            while (i < str.length() && str.charAt(i) == ' ')
                 i++;
             if (str.charAt(i) == '\'') {
                 i++;
@@ -133,40 +133,38 @@ public class Main {
             } else if (str.charAt(i) == '"') {
                 i++;
                 int start = i;
-                while (i+1 < str.length() && str.charAt(i+1) != ' ') {
+                while (i < str.length() && ((str.charAt(i - 1) == '\\' || str.charAt(i) != '"'))) {
                     i++;
                 }
                 String currentString = str.substring(start, i);
                 Stack<Character> stk = new Stack<>();
                 boolean lastPop = false;
-                for(int j = 0; j < currentString.length(); j++){
-                    if(!stk.isEmpty() && stk.peek() == '\\'){
-                        if(currentString.charAt(j) == '\\' || currentString.charAt(j) == '"' || currentString.charAt(j) == '$'){
+                boolean escapeStart = false;
+                for (int j = 0; j < currentString.length(); j++) {
+                    if (!stk.isEmpty() && stk.peek() == '\\') {
+                        if (currentString.charAt(j) == '\\' || currentString.charAt(j) == '"' || currentString.charAt(j) == '$') {
                             stk.pop();
-                            if(j == currentString.length()-1){
-                                lastPop = true;
+                            if (currentString.charAt(j) == '"') {
+                                escapeStart = true;
                             }
+
                         }
                         stk.push(currentString.charAt(j));
                     } else {
-                        if(currentString.charAt(j) != '"')
+                        if (currentString.charAt(j) != '"')
                             stk.push(currentString.charAt(j));
                     }
                 }
-                if(stk.peek() == '\\' && !lastPop) stk.pop();
                 StringBuilder builder = new StringBuilder();
-                while(!stk.isEmpty()){
+                while (!stk.isEmpty()) {
                     builder.append(stk.pop());
                 }
                 builder.reverse();
-                if(currentString.charAt(currentString.length()-1) == '\\' && currentString.charAt(currentString.length()-2) != '\\'){
-                    builder.append('"');
-                }
                 result.add(builder.toString());
                 i++;
             } else {
                 int start = i;
-                while (i < str.length() && ((i>0 && str.charAt(i-1) == '\\') || str.charAt(i) != ' ')) {
+                while (i < str.length() && ((i > 0 && str.charAt(i - 1) == '\\') || str.charAt(i) != ' ')) {
                     i++;
                 }
                 result.add(str.substring(start, i).replace("\\", ""));
@@ -188,3 +186,4 @@ enum Builtin {
 //$ echo "world'test'\\n'script"
 //$ echo "hello\"insidequotes"world\"
 //$ echo "mixed\"quote'test'\\"
+//cat "/tmp/baz/'f 17'" "/tmp/baz/'f  \72'" "/tmp/baz/'f \92\'"
