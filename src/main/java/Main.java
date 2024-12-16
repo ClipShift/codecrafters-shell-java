@@ -133,16 +133,31 @@ public class Main {
             } else if (str.charAt(i) == '"') {
                 i++;
                 int start = i;
-                while (i < str.length() && (str.charAt(i-1) == '\\' || str.charAt(i) != '"' || (i+1 < str.length() && str.charAt(i+1) != ' '))) {
+                while (i+1 < str.length() && str.charAt(i+1) != ' ') {
                     i++;
                 }
-                String substring = str.substring(start, i);
-                String s = substring.replaceAll("([a-zA-Z0-9])\"", "$1");
-                String replace = s.replace("\\\"", "\"").replace("\\\\", "\\");
-                if(replace.charAt(replace.length()-1) == '"'){
-                    replace = replace.substring(0, replace.length()-1);
+                String currentString = str.substring(start, i);
+                Stack<Character> stk = new Stack<>();
+                for(int j = 1; j < currentString.length(); j++){
+                    if(!stk.isEmpty() && stk.peek() == '\\'){
+                        if(str.charAt(j) == '\\' || str.charAt(j) == '"' || str.charAt(j) == '$'){
+                            stk.pop();
+                        }
+                        stk.push(str.charAt(j));
+                    } else {
+                        if(str.charAt(j) != '"')
+                            stk.push(str.charAt(j));
+                    }
                 }
-                result.add(replace);
+                StringBuilder builder = new StringBuilder();
+                while(!stk.isEmpty()){
+                    builder.append(stk.pop());
+                }
+                builder.reverse();
+                if(currentString.charAt(currentString.length()-1) == '\\' && currentString.charAt(currentString.length()-2) != '\\'){
+                    builder.append('"');
+                }
+                result.add(builder.toString());
                 i++;
             } else {
                 int start = i;
