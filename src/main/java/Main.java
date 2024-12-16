@@ -138,7 +138,11 @@ public class Main {
                 }
                 String substring = str.substring(start, i);
                 String s = substring.replaceAll("([a-zA-Z0-9])\"", "$1");
-                result.add(s.replace("\\\"", "\"").replace("\\\\", "\\"));
+                String replace = s.replace("\\\"", "\"").replace("\\\\", "\\");
+                if(replace.charAt(replace.length()-1) == '"'){
+                    replace = replace.substring(0, replace.length()-1);
+                }
+                result.add(replace);
                 i++;
             } else {
                 int start = i;
