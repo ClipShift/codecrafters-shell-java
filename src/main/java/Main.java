@@ -90,7 +90,11 @@ public class Main {
             } else if (scripts.containsKey(command[0])) {
                 ProcessBuilder processBuilder = new ProcessBuilder(command[0]);
                 if (command.length > 1) {
-                    processBuilder.command(command[0], command[1]);
+                    List<String> strings = new ArrayList<>();
+                    strings.add(command[0]);
+                    strings.addAll(parseQuotes(command[1]));
+                    String[] array = strings.toArray(new String[0]);
+                    processBuilder.command(array);
                 } else if ("ls".equals(command[0])) {
                     processBuilder.command(command[0], pwd);
                 }
