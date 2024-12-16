@@ -133,10 +133,12 @@ public class Main {
             } else if (str.charAt(i) == '"') {
                 i++;
                 int start = i;
-                while (i < str.length() && (str.charAt(i-1) == '\\' || str.charAt(i) != '"')) {
+                while (i < str.length() && (str.charAt(i-1) == '\\' || str.charAt(i) != '"' || (i+1 < str.length() && str.charAt(i+1) != ' '))) {
                     i++;
                 }
-                result.add(str.substring(start, i).replace("\\\"", "\"").replace("\\\\", "\\"));
+                String substring = str.substring(start, i);
+                String s = substring.replaceAll("([a-zA-Z0-9])\"", "$1");
+                result.add(s.replace("\\\"", "\"").replace("\\\\", "\\"));
                 i++;
             } else {
                 int start = i;
