@@ -136,7 +136,7 @@ public class Main {
                 while (i < str.length() && (str.charAt(i-1) == '\\' || str.charAt(i) != '"')) {
                     i++;
                 }
-                result.add(str.substring(start, i).replace("\\\"", "\""));
+                result.add(str.substring(start, i).replace("\\\"", "\"").replace("\\\\", "\\"));
                 i++;
             } else {
                 int start = i;
