@@ -4,6 +4,8 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class Main {
@@ -31,33 +33,37 @@ public class Main {
             System.out.print("$ ");
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine();
-            String[] command = input.split(" ", 2);
-
-            if (isBuiltin(command[0])) {
-                Builtin builtin = Builtin.valueOf(command[0]);
+            List<String> commands = parseCommand(input);
+            String command = commands.getFirst();
+            if (isBuiltin(command)) {
+                Builtin builtin = Builtin.valueOf(command);
                 switch (builtin) {
                     case exit: {
-                        if ("0".equals(command[1]))
+                        if ("0".equals(commands.get(1)))
                             break repl;
                     }
 
                     case echo: {
-                        List<String> strings = parseQuotes(command[1]);
-                        StringJoiner stringJoiner = new StringJoiner(" ");
-                        for(String s: strings){
-                            stringJoiner.add(s);
-                        }
-                        System.out.println(stringJoiner.toString());
+                        ProcessBuilder processBuilder = new ProcessBuilder(commands);
+                        processBuilder.inheritIO();
+                        Process process = processBuilder.start();
+                        int exitCode = process.waitFor();
+//                        List<String> strings = parseQuotes(command[1]);
+//                        StringJoiner stringJoiner = new StringJoiner(" ");
+//                        for(String s: strings){
+//                            stringJoiner.add(s);
+//                        }
+//                        System.out.println(stringJoiner.toString());
                         break;
                     }
 
                     case type: {
-                        if (isBuiltin(command[1])) {
-                            System.out.printf("%s is a shell builtin%n", command[1]);
-                        } else if (scripts.containsKey(command[1])) {
-                            System.out.printf("%s is %s%n", command[1], scripts.get(command[1]).getPath());
+                        if (isBuiltin(commands.get(1))) {
+                            System.out.printf("%s is a shell builtin%n", commands.get(1));
+                        } else if (scripts.containsKey(commands.get(1))) {
+                            System.out.printf("%s is %s%n", commands.get(1), scripts.get(commands.get(1)).getPath());
                         } else {
-                            System.out.printf("%s: not found%n", command[1]);
+                            System.out.printf("%s: not found%n", commands.get(1));
                         }
                         break;
                     }
@@ -70,33 +76,27 @@ public class Main {
                     case cd: {
                         try {
                             Path newPath;
-                            if (command[1].charAt(0) == '~') {
-                                newPath = Paths.get(System.getenv("HOME"), command[1].substring(1));
-                            } else if (command[1].charAt(0) == '/')
-                                newPath = Paths.get(command[1]);
+                            if (commands.get(1).charAt(0) == '~') {
+                                newPath = Paths.get(System.getenv("HOME"), commands.get(1).substring(1));
+                            } else if (commands.get(1).charAt(0) == '/')
+                                newPath = Paths.get(commands.get(1));
                             else
-                                newPath = Paths.get(pwd, command[1]);
+                                newPath = Paths.get(pwd, commands.get(1));
                             if (Files.notExists(newPath)) {
-                                System.out.printf("cd: %s: No such file or directory%n", command[1]);
+                                System.out.printf("cd: %s: No such file or directory%n", commands.get(1));
                             } else {
                                 pwd = newPath.toRealPath().toAbsolutePath().toString();
                             }
                         } catch (InvalidPathException e) {
-                            System.out.printf("cd: %s: No such file or directory%n", command[1]);
+                            System.out.printf("cd: %s: No such file or directory%n", commands.get(1));
                         }
                         break;
                     }
                 }
-            } else if (scripts.containsKey(command[0])) {
-                ProcessBuilder processBuilder = new ProcessBuilder(command[0]);
-                if (command.length > 1) {
-                    List<String> strings = new ArrayList<>();
-                    strings.add(command[0]);
-                    strings.addAll(parseQuotes(command[1]));
-                    String[] array = strings.toArray(new String[0]);
-                    processBuilder.command(array);
-                } else if ("ls".equals(command[0])) {
-                    processBuilder.command(command[0], pwd);
+            } else if (scripts.containsKey(command)) {
+                ProcessBuilder processBuilder = new ProcessBuilder(commands);
+                if ("ls".equals(command)) {
+                    processBuilder.command(command, pwd);
                 }
                 processBuilder.inheritIO();
                 Process process = processBuilder.start();
@@ -116,62 +116,49 @@ public class Main {
         }
     }
 
-    private static List<String> parseQuotes(String str) {
-        List<String> result = new ArrayList<>();
+    private static List<String> parseCommand(String input) {
+        List<String> arg = new ArrayList<>();
+
         int i = 0;
-        while (i < str.length()) {
-            while (i < str.length() && str.charAt(i) == ' ')
-                i++;
-            if (str.charAt(i) == '\'') {
-                i++;
-                int start = i;
-                while (i < str.length() && str.charAt(i) != '\'') {
-                    i++;
+        boolean inSingle = false, inDouble = false, isEscaped = false;
+        StringBuilder currentArg = new StringBuilder();
+        while(i < input.length()){
+            if(input.charAt(i) == '"'){
+                if(!isEscaped && !inSingle)
+                    inDouble = !inDouble;
+                else{
+                    currentArg.append(input.charAt(i));
+                    isEscaped = false;
                 }
-                result.add(str.substring(start, i));
-                i++;
-            } else if (str.charAt(i) == '"') {
-                i++;
-                int start = i;
-                while (i < str.length() && ((str.charAt(i - 1) == '\\' || str.charAt(i) != '"'))) {
-                    i++;
+            } else if (input.charAt(i) == '\''){
+                if(!isEscaped && !inDouble)
+                    inSingle = !inSingle;
+                else {
+                    currentArg.append(input.charAt(i));
+                    isEscaped = false;
                 }
-                String currentString = str.substring(start, i);
-                Stack<Character> stk = new Stack<>();
-                boolean lastPop = false;
-                boolean escapeStart = false;
-                for (int j = 0; j < currentString.length(); j++) {
-                    if (!stk.isEmpty() && stk.peek() == '\\') {
-                        if (currentString.charAt(j) == '\\' || currentString.charAt(j) == '"' || currentString.charAt(j) == '$') {
-                            stk.pop();
-                            if (currentString.charAt(j) == '"') {
-                                escapeStart = true;
-                            }
+            } else if (input.charAt(i) == '\\'){
+                if(inDouble || !inSingle)
+                    isEscaped = true;
+                else
+                    currentArg.append(input.charAt(i));
 
-                        }
-                        stk.push(currentString.charAt(j));
-                    } else {
-                        if (currentString.charAt(j) != '"')
-                            stk.push(currentString.charAt(j));
+            } else if (input.charAt(i) == ' '){
+                if(!inSingle && !inDouble){
+                    if(!currentArg.isEmpty()){
+                        arg.add(currentArg.toString());
+                        currentArg = new StringBuilder();
                     }
+                } else {
+                    currentArg.append(input.charAt(i));
                 }
-                StringBuilder builder = new StringBuilder();
-                while (!stk.isEmpty()) {
-                    builder.append(stk.pop());
-                }
-                builder.reverse();
-                result.add(builder.toString());
-                i++;
             } else {
-                int start = i;
-                while (i < str.length() && ((i > 0 && str.charAt(i - 1) == '\\') || str.charAt(i) != ' ')) {
-                    i++;
-                }
-                result.add(str.substring(start, i).replace("\\", ""));
+                currentArg.append(input.charAt(i));
             }
+            i++;
         }
-
-        return result;
+        arg.add(currentArg.toString());
+        return arg;
     }
 }
 
