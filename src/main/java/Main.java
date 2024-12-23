@@ -120,7 +120,7 @@ public class Main {
         List<String> arg = new ArrayList<>();
 
         int i = 0;
-        boolean inSingle = false, inDouble = false, isEscaped = false;
+        boolean inSingle = false, inDouble = false, isEscaped = false, inDoubleSingle = false;
         StringBuilder currentArg = new StringBuilder();
         while(i < input.length()){
             if(input.charAt(i) == '"'){
@@ -131,14 +131,21 @@ public class Main {
                     isEscaped = false;
                 }
             } else if (input.charAt(i) == '\''){
-                if(!isEscaped && !inDouble)
+                if(inDouble){
+                    inDoubleSingle = !inDoubleSingle;
+                    currentArg.append(input.charAt(i));
+                }
+                else if(!isEscaped)
                     inSingle = !inSingle;
                 else {
                     currentArg.append(input.charAt(i));
                     isEscaped = false;
                 }
             } else if (input.charAt(i) == '\\'){
-                if(isEscaped){
+                if(inDoubleSingle){
+                    currentArg.append(input.charAt(i));
+                }
+                else if(isEscaped){
                     currentArg.append(input.charAt(i));
                     isEscaped = false;
                 }
