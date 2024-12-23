@@ -138,10 +138,15 @@ public class Main {
                     isEscaped = false;
                 }
             } else if (input.charAt(i) == '\\'){
-                if(inDouble || !inSingle)
+                if(isEscaped){
+                    currentArg.append(input.charAt(i));
+                    isEscaped = false;
+                }
+                else if(inDouble || !inSingle)
                     isEscaped = true;
                 else
                     currentArg.append(input.charAt(i));
+
 
             } else if (input.charAt(i) == ' '){
                 if(!inSingle && !inDouble){
