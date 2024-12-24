@@ -156,7 +156,10 @@ public class Main {
 
 
             } else if (input.charAt(i) == ' '){
-                if(!inSingle && !inDouble){
+                if(isEscaped){
+                    isEscaped = false;
+                    currentArg.append(input.charAt(i));
+                } else if(!inSingle && !inDouble){
                     if(!currentArg.isEmpty()){
                         arg.add(currentArg.toString());
                         currentArg = new StringBuilder();
