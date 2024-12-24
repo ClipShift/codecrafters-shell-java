@@ -158,6 +158,7 @@ public class Main {
             } else if (input.charAt(i) == ' '){
                 if(isEscaped){
                     isEscaped = false;
+                    currentArg.append('\\');
                     currentArg.append(input.charAt(i));
                 } else if(!inSingle && !inDouble){
                     if(!currentArg.isEmpty()){
