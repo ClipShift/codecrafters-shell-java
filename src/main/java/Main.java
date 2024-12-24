@@ -35,7 +35,8 @@ public class Main {
             String input = scanner.nextLine();
             List<String> commands = parseCommand(input);
             String command = commands.getFirst();
-            System.out.println(scripts.keySet());
+            if(command.equals("my_exe"))
+                System.out.println(scripts.keySet());
             if (isBuiltin(command)) {
                 Builtin builtin = Builtin.valueOf(command);
                 switch (builtin) {
