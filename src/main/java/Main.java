@@ -22,11 +22,8 @@ public class Main {
             System.out.print("$ ");
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine();
-            List<String> commands = new ArrayList<>();
-            commands.add("sh"); commands.add("-c"); commands.add(input);
-            List<String> strings = parseCommand(input);
-//            commands.addAll(strings);
-            String command = strings.getFirst();
+            List<String> commands = parseCommand(input);
+            String command = commands.getFirst();
             Map<String, File> scripts = new HashMap<>();
             for (String path : paths) {
                 try (Stream<Path> directories = Files.walk(Paths.get(path))) {
