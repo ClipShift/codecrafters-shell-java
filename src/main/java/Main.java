@@ -92,6 +92,13 @@ public class Main {
                         }
                         processBuilder.redirectOutput(file);
                         break;
+                    } else if (commands.get(x).equals("2>")) {
+                        File file = new File(commands.get(x + 1));
+                        if(!file.exists()){
+                            file.createNewFile();
+                        }
+                        processBuilder.redirectError(file);
+                        break;
                     } else {
                         undirected.add(commands.get(x));
                     }
