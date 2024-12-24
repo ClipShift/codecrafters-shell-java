@@ -36,8 +36,9 @@ public class Main {
             List<String> commands = parseCommand(input);
             String command = commands.getFirst();
             if(command.equals("my_exe")){
-                System.out.println(scripts.keySet());
-                System.out.println(Arrays.toString(paths));
+                System.out.printf("Commands: %s%n", scripts.keySet());
+                System.out.printf("Paths: %s%n", Arrays.toString(paths));
+                System.out.printf("Command and Arguments %s%n", commands);
             }
 
             if (isBuiltin(command)) {
