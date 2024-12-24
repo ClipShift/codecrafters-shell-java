@@ -170,6 +170,10 @@ public class Main {
                     currentArg.append(input.charAt(i));
                 }
             } else {
+                if(isEscaped){
+                    isEscaped = false;
+                    currentArg.append('\\');
+                }
                 currentArg.append(input.charAt(i));
             }
             i++;
