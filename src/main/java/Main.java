@@ -35,12 +35,6 @@ public class Main {
 
                 }
             }
-            if(command.equals("my_exe")){
-                System.out.printf("Commands: %s%n", scripts.keySet());
-                System.out.printf("Paths: %s%n", Arrays.toString(paths));
-                System.out.printf("Command and Arguments %s%n", commands);
-            }
-
             if (isBuiltin(command)) {
                 Builtin builtin = Builtin.valueOf(command);
                 switch (builtin) {
