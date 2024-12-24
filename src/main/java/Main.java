@@ -22,8 +22,11 @@ public class Main {
             System.out.print("$ ");
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine();
-            List<String> commands = parseCommand(input);
-            String command = commands.getFirst();
+            List<String> commands = new ArrayList<>();
+            commands.add("sh"); commands.add("-c"); commands.add(input);
+            List<String> strings = parseCommand(input);
+//            commands.addAll(strings);
+            String command = strings.getFirst();
             Map<String, File> scripts = new HashMap<>();
             for (String path : paths) {
                 try (Stream<Path> directories = Files.walk(Paths.get(path))) {
@@ -48,12 +51,6 @@ public class Main {
                         processBuilder.inheritIO();
                         Process process = processBuilder.start();
                         int exitCode = process.waitFor();
-//                        List<String> strings = parseQuotes(command[1]);
-//                        StringJoiner stringJoiner = new StringJoiner(" ");
-//                        for(String s: strings){
-//                            stringJoiner.add(s);
-//                        }
-//                        System.e(stringJoiner.toString());
                         break;
                     }
 
@@ -194,8 +191,3 @@ enum Builtin {
     pwd,
     cd
 }
-
-//$ echo "world'test'\\n'script"
-//$ echo "hello\"insidequotes"world\"
-//$ echo "mixed\"quote'test'\\"
-//cat "/tmp/baz/'f 17'" "/tmp/baz/'f  \72'" "/tmp/baz/'f \92\'"
