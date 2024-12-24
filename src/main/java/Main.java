@@ -13,23 +13,23 @@ public class Main {
 
         String pathEnv = System.getenv("PATH");
         String[] paths = pathEnv.split(":");
-        Map<String, File> scripts = new HashMap<>();
-        for (String path : paths) {
-            try (Stream<Path> directories = Files.walk(Paths.get(path))) {
-                directories
-                        .filter(Files::isRegularFile)
-                        .filter(Files::isExecutable)
-                        .forEach(file -> scripts.put(String.valueOf(file.getFileName()), file.toFile()));
-            } catch (Exception _) {
-
-            }
-        }
         Path currentPath = Paths.get("");
         String pwd = currentPath.toAbsolutePath().toString();
 
         // Uncomment this block to pass the first stage
         repl:
         while (true) {
+            Map<String, File> scripts = new HashMap<>();
+            for (String path : paths) {
+                try (Stream<Path> directories = Files.walk(Paths.get(path))) {
+                    directories
+                            .filter(Files::isRegularFile)
+                            .filter(Files::isExecutable)
+                            .forEach(file -> scripts.put(String.valueOf(file.getFileName()), file.toFile()));
+                } catch (Exception _) {
+
+                }
+            }
             System.out.print("$ ");
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine();
@@ -102,7 +102,7 @@ public class Main {
                 Process process = processBuilder.start();
                 int exitCode = process.waitFor();
             } else {
-                System.out.printf("%s: command not found%n", input);
+                System.out.printf("%s: command not found%n", command);
             }
         }
     }
