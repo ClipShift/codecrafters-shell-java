@@ -43,14 +43,6 @@ public class Main {
                             break repl;
                     }
 
-//                    case echo: {
-//                        ProcessBuilder processBuilder = new ProcessBuilder(commands);
-//                        processBuilder.inheritIO();
-//                        Process process = processBuilder.start();
-//                        int exitCode = process.waitFor();
-//                        break;
-//                    }
-
                     case type: {
                         if (isBuiltin(commands.get(1)) || "echo".equals(commands.get(1))) {
                             System.out.printf("%s is a shell builtin%n", commands.get(1));
@@ -88,11 +80,28 @@ public class Main {
                     }
                 }
             } else if (scripts.containsKey(command)) {
-                ProcessBuilder processBuilder = new ProcessBuilder(commands);
-                if ("ls".equals(command)) {
+                List<String> undirected = new ArrayList<>();
+                ProcessBuilder processBuilder = new ProcessBuilder();
+                processBuilder.inheritIO();
+                int x = 0;
+                while(x < commands.size()) {
+                    if (commands.get(x).equals(">") || commands.get(x).equals("1>")) {
+                        File file = new File(commands.get(x + 1));
+                        if(!file.exists()){
+                            file.createNewFile();
+                        }
+                        processBuilder.redirectOutput(file);
+                        break;
+                    } else {
+                        undirected.add(commands.get(x));
+                    }
+                    x++;
+                }
+
+                    if ("ls".equals(command)) {
                     processBuilder.command(command, pwd);
                 }
-                processBuilder.inheritIO();
+                processBuilder.command(undirected);
                 Process process = processBuilder.start();
                 int exitCode = process.waitFor();
             } else {
@@ -183,7 +192,6 @@ public class Main {
 
 enum Builtin {
     exit,
-//    echo,
     type,
     pwd,
     cd
