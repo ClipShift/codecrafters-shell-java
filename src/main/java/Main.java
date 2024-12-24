@@ -23,8 +23,8 @@ public class Main {
             for (String path : paths) {
                 try (Stream<Path> directories = Files.walk(Paths.get(path))) {
                     directories
-                            .filter(Files::isRegularFile)
-                            .filter(Files::isExecutable)
+//                            .filter(Files::isRegularFile)
+//                            .filter(Files::isExecutable)
                             .forEach(file -> scripts.put(String.valueOf(file.getFileName()), file.toFile()));
                 } catch (Exception _) {
 
