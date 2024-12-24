@@ -19,6 +19,11 @@ public class Main {
         // Uncomment this block to pass the first stage
         repl:
         while (true) {
+            System.out.print("$ ");
+            Scanner scanner = new Scanner(System.in);
+            String input = scanner.nextLine();
+            List<String> commands = parseCommand(input);
+            String command = commands.getFirst();
             Map<String, File> scripts = new HashMap<>();
             for (String path : paths) {
                 try (Stream<Path> directories = Files.walk(Paths.get(path))) {
@@ -30,11 +35,6 @@ public class Main {
 
                 }
             }
-            System.out.print("$ ");
-            Scanner scanner = new Scanner(System.in);
-            String input = scanner.nextLine();
-            List<String> commands = parseCommand(input);
-            String command = commands.getFirst();
             if(command.equals("my_exe")){
                 System.out.printf("Commands: %s%n", scripts.keySet());
                 System.out.printf("Paths: %s%n", Arrays.toString(paths));
