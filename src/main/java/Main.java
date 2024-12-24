@@ -43,16 +43,16 @@ public class Main {
                             break repl;
                     }
 
-                    case echo: {
-                        ProcessBuilder processBuilder = new ProcessBuilder(commands);
-                        processBuilder.inheritIO();
-                        Process process = processBuilder.start();
-                        int exitCode = process.waitFor();
-                        break;
-                    }
+//                    case echo: {
+//                        ProcessBuilder processBuilder = new ProcessBuilder(commands);
+//                        processBuilder.inheritIO();
+//                        Process process = processBuilder.start();
+//                        int exitCode = process.waitFor();
+//                        break;
+//                    }
 
                     case type: {
-                        if (isBuiltin(commands.get(1))) {
+                        if (isBuiltin(commands.get(1)) || "echo".equals(commands.get(1))) {
                             System.out.printf("%s is a shell builtin%n", commands.get(1));
                         } else if (scripts.containsKey(commands.get(1))) {
                             System.out.printf("%s is %s%n", commands.get(1), scripts.get(commands.get(1)).getPath());
@@ -183,7 +183,7 @@ public class Main {
 
 enum Builtin {
     exit,
-    echo,
+//    echo,
     type,
     pwd,
     cd
