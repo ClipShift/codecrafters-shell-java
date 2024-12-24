@@ -85,19 +85,34 @@ public class Main {
                 processBuilder.inheritIO();
                 int x = 0;
                 while(x < commands.size()) {
-                    if (commands.get(x).equals(">") || commands.get(x).equals("1>") || commands.get(x).equals(">>") || commands.get(x).equals("1>>")) {
+                    if (commands.get(x).equals(">") || commands.get(x).equals("1>")) {
                         File file = new File(commands.get(x + 1));
                         if(!file.exists()){
                             file.createNewFile();
                         }
                         processBuilder.redirectOutput(file);
                         break;
-                    } else if (commands.get(x).equals("2>") || commands.get(x).equals("2>>")) {
+                    } else if (commands.get(x).equals(">>") || commands.get(x).equals("1>>")){
+                        File file = new File(commands.get(x + 1));
+                        if(!file.exists()){
+                            file.createNewFile();
+                        }
+                        processBuilder.redirectOutput(ProcessBuilder.Redirect.appendTo(file));
+                        break;
+                    }
+                    else if (commands.get(x).equals("2>")) {
                         File file = new File(commands.get(x + 1));
                         if(!file.exists()){
                             file.createNewFile();
                         }
                         processBuilder.redirectError(file);
+                        break;
+                    } else if (commands.get(x).equals("2>>")){
+                        File file = new File(commands.get(x + 1));
+                        if(!file.exists()){
+                            file.createNewFile();
+                        }
+                        processBuilder.redirectError(ProcessBuilder.Redirect.appendTo(file));
                         break;
                     } else {
                         undirected.add(commands.get(x));
