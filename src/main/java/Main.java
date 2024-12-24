@@ -156,16 +156,17 @@ public class Main {
 
 
             } else if (input.charAt(i) == ' '){
-                if(isEscaped){
+                if(isEscaped && inDouble){
                     isEscaped = false;
                     currentArg.append('\\');
                     currentArg.append(input.charAt(i));
-                } else if(!inSingle && !inDouble){
+                } else if(!inSingle && !inDouble && !isEscaped){
                     if(!currentArg.isEmpty()){
                         arg.add(currentArg.toString());
                         currentArg = new StringBuilder();
                     }
                 } else {
+                    if(isEscaped) isEscaped = false;
                     currentArg.append(input.charAt(i));
                 }
             } else {
