@@ -53,7 +53,7 @@ public class Main {
 //                        for(String s: strings){
 //                            stringJoiner.add(s);
 //                        }
-//                        System.out.println(stringJoiner.toString());
+//                        System.e(stringJoiner.toString());
                         break;
                     }
 
@@ -132,6 +132,10 @@ public class Main {
                 }
             } else if (input.charAt(i) == '\''){
                 if(inDouble){
+                    if(isEscaped){
+                        isEscaped = false;
+                        currentArg.append('\\');
+                    }
                     inDoubleSingle = !inDoubleSingle;
                     currentArg.append(input.charAt(i));
                 }
